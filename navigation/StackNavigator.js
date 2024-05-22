@@ -12,6 +12,11 @@ const StackNavigator = () => {
         <NavigationContainer>
             <Stack.Navigator>
                 <Stack.Screen
+                    name="List"
+                    component={ListScreen}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
                     name="Detail"
                     component={DetailScreen}
                     options={{ headerShown: false }}
@@ -21,11 +26,6 @@ const StackNavigator = () => {
                     component={AddScreen}
                     options={{ headerShown: false }}
                     />
-                <Stack.Screen
-                    name="List"
-                    component={ListScreen}
-                    options={{ headerShown: false }}
-                />
             </Stack.Navigator>
         </NavigationContainer>
     );
