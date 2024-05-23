@@ -12,39 +12,38 @@ import { useNavigation } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import { getAll } from "../api/Api";
-import StudentItem from "../components/studentItem"; // Đảm bảo đường dẫn đúng với file của bạn
+import PatientItem from "../components/PatientItem"; // Đảm bảo đường dẫn đúng với file của bạn
 
 const App = () => {
   const navigation = useNavigation();
-  const [student, setStudents] = useState([]);
+  const [patient, setPatients] = useState([]);
    const [searchKeyword, setSearchKeyword] = useState("");
 
   useEffect(() => {
-    const fetchStudents = async () => {
+    const fetchPatients = async () => {
       try {
-        const allStudents = await getAll();
+        const allPatient = await getAll();
        
-        setStudents(allStudents); // Lưu dữ liệu vào state nếu bạn muốn sử dụng trong component
+        setPatients(allPatient); // Lưu dữ liệu vào state nếu bạn muốn sử dụng trong component
       } catch (error) {
-        console.error("Lỗi khi lấy danh sách sinh viên:", error);
+        console.error("Lỗi khi lấy danh sách bệnh nhân:", error);
       }
     };
 
-    fetchStudents();
+    fetchPatients();
   }, []);
 
    const handleSearchPress = async () => {
      try {
        const searchResults = await getAll(searchKeyword);
-       setStudents(searchResults);
+       setPatients(searchResults);
      } catch (error) {
-       console.error("Lỗi khi tìm kiếm sinh viên:", error);
+       console.error("Lỗi khi tìm kiếm bệnh nhân:", error);
      }
    };
 
-  const handleStudentPress = (student) => {
- 
-     navigation.navigate("Detail", { student: student }); // Điều hướng đến màn hình chi tiết ứng viên (DetailScreen)
+  const handlePatientPress = (patient) => {
+    navigation.navigate("Detail", { patient: patient }); // Điều hướng đến màn hình chi tiết ứng viên (DetailScreen)
   };
 
   return (
@@ -76,11 +75,11 @@ const App = () => {
             </TouchableOpacity>
           </View>
         </View>
-        {student?.map((item, index) => (
-          <StudentItem
+        {patient?.map((item, index) => (
+          <PatientItem
             key={index}
-            student={item}
-            onPress={() => handleStudentPress(item)}
+            patient={item}
+            onPress={() => handlePatientPress(item)}
           />
         ))}
       </View>

@@ -1,55 +1,50 @@
-import axios from 'axios';
+import axios from "axios";
 
-const BASE_URL = "http://localhost:3333/api/v0";
+const BASE_URL = "http://kiemtra.stecom.vn:8888/api/benh-nhan/PTN217766";
 
 export const getAll = async () => {
-    try {
-        console.log('getAll')
-       
-        const response = await axios.get(`${BASE_URL}/getproducts`);
-        return response.data.result;
-    } catch (error) {
-        console.error('Lỗi tìm kiếm:', error.response ? error.response.data : error.message);
-        throw error;
-    }
+  try {
+    const url = `${BASE_URL}/get-all`;
+    const response = await axios.get(url, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data.items;
+  } catch (error) {
+    console.error(
+      "Lỗi tìm kiếm:",
+      error.response ? error.response.data : error.message
+    );
+    throw error;
+  }
 };
 
 export const getById = async (id) => {
-    const response = await axios.get(`${BASE_URL}/${id}`);
+  const response = await axios.get(`${BASE_URL}/${id}`);
+  return response.data;
+};
+
+export const addPatient = async (patient) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/create`, patient);
     return response.data;
+  } catch (error) {
+    console.error(
+      "Lỗi thêm bênh nhân:",
+      error.response ? error.response.data : error.message
+    );
+    throw error;
+  }
 };
-
-export const add = async (candidate) => {
-    try {
-        const response = await axios.post(`${BASE_URL}/create`, candidate);
-        return response.data;
-    } catch (error) {
-        console.error('Lỗi thêm ứng viên:', error.response ? error.response.data : error.message);
-        throw error;
-    }
-};
-
 
 export const dele = async (id) => {
-    try {
-        const response = await axios.delete(`${BASE_URL}/${id}`);
-        return response.data;
-    } catch (error) {
-        console.error('Lỗi xóa ứng viên:', error);
-        throw error;
-    }
+  try {
+    const response = await axios.delete(`${BASE_URL}/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Lỗi xóa bệnh nhân:", error);
+    throw error;
+  }
 };
 
-export const update = async (id, candidate) => {
-    try {
-        const response = await axios.put(`${BASE_URL}/update/${id}`, candidate, {
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-        return response.data;
-    } catch (error) {
-        console.error('Lỗi cập nhật ứng viên:', error);
-        throw error;
-    }
-};

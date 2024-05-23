@@ -11,38 +11,51 @@ import {
 import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
-import axios from "axios"; // Giả sử bạn sử dụng axios để gọi API
-
-const AddAddressScreen = () => {
+import axios from "axios"; // Assuming you use axios for API calls
+import {addPatient} from "../api/Api";
+const AddScreen = () => {
   const navigation = useNavigation();
 
-  // State để lưu trữ thông tin nhập liệu
+  // State to store form inputs
   const [name, setName] = useState("");
-  const [code, setCode] = useState("");
-  const [experience, setExperience] = useState("");
-  const [email, setEmail] = useState("");
+  const [id, setId] = useState("");
+  const [diseaseName, setDiseaseName] = useState("");
+  const [number, setNumber] = useState("");
   const [address, setAddress] = useState("");
   const [errors, setErrors] = useState({});
 
-  // Hàm xử lý khi nhấn nút "Hủy bỏ"
+  // Handle Cancel button press
   const handleCancelPress = () => {
-    navigation.goBack(); // Điều hướng trở lại trang trước đó
+    navigation.goBack(); // Navigate back to the previous screen
   };
-  // Hàm kiểm tra ràng buộc
+
+  // Validation function
   const validate = () => {
     let valid = true;
     let errors = {};
 
-    if (name.length < 25) {
-      errors.name = "Tên ứng viên phải có ít nhất 25 ký tự.";
+    if (name.length < 5 || name.length > 255) {
+      errors.name =
+        "Tên bệnh nhân phải có ít nhất 5 ký tự và tối đa 255 kí tự.";
       valid = false;
     }
-    if (!email.includes("@")) {
-      errors.email = "Email phải chứa ký tự @.";
+    if (diseaseName.length < 5 || diseaseName.length > 255) {
+      errors.diseaseName =
+        "Tên bệnh phải có ít nhất 5 ký tự và tối đa 255 kí tự.";
       valid = false;
     }
-    if (code.trim() === "") {
-      errors.code = "Mã số ứng viên không được bỏ trống.";
+    if (number.length < 10 || number.length > 15) {
+      errors.number =
+        "Số điện thoại phải có ít nhất 10 ký tự và tối đa 15 kí tự.";
+      valid = false;
+    }
+    if (id.length < 10 || id.length > 50) {
+      errors.id =
+        "Mã số bệnh nhân phải có ít nhất 10 ký tự và tối đa 50 kí tự.";
+      valid = false;
+    }
+    if (address.length > 255) {
+      errors.address = "Địa chỉ phải có tối đa 255 kí tự.";
       valid = false;
     }
 
@@ -50,32 +63,36 @@ const AddAddressScreen = () => {
     return valid;
   };
 
-  // Hàm xử lý khi nhấn nút "Lưu lại"
+  // Handle Save button press
   const handleSavePress = async () => {
     if (!validate()) {
       return;
     }
-    // Tạo đối tượng ứng viên từ các state
-    const student = {
+
+    // Create patient object from state
+    const patient = {
       name,
-      code,
-      experience,
-      email,
+      id,
+      diseaseName,
+      number,
       address,
     };
 
     try {
-      // Gọi API để lưu thông tin ứng viên
-      const response = add(student);
+      // Call API to save patient info
+      const response = addPatient(patient);
 
       if (response.status === 200 || response.status === 201) {
-        Alert.alert("Thành công", "Ứng viên đã được lưu thành công.");
-        navigation.navigate("List"); // Điều hướng về trang danh sách ứng viên
+        Alert.alert(
+          "Thành công",
+          "Thông tin bệnh nhân đã được lưu thành công."
+        );
+        navigation.navigate("List"); 
       } else {
-        Alert.alert("Lỗi", "Có lỗi xảy ra khi lưu ứng viên.");
+        Alert.alert("Lỗi", "Có lỗi xảy ra khi lưu thông tin bệnh nhân.");
       }
     } catch (error) {
-      console.error("Lỗi khi lưu ứng viên:", error);
+      console.error("Lỗi khi lưu thông tin bệnh nhân:", error);
       Alert.alert("Lỗi", "Không thể kết nối đến máy chủ.");
     }
   };
@@ -90,14 +107,16 @@ const AddAddressScreen = () => {
           >
             <AntDesign name="left" size={24} color="black" />
           </TouchableOpacity>
-          <Text style={styles.searchBarTitle}>Thêm ứng viên</Text>
+          <Text style={styles.searchBarTitle}>Thêm bênh nhân</Text>
         </View>
 
         <View>
-          <Text style={{ fontWeight: "bold", fontSize: 17 }}>Tên ứng viên</Text>
+          <Text style={{ fontWeight: "bold", fontSize: 17 }}>
+            Tên bệnh nhân
+          </Text>
           <TextInput
             placeholderTextColor={"black"}
-            placeholder="Nhập tên ứng viên"
+            placeholder="Nhập tên bệnh nhân"
             style={styles.input}
             value={name}
             onChangeText={setName}
@@ -107,49 +126,48 @@ const AddAddressScreen = () => {
 
         <View>
           <Text style={{ fontWeight: "bold", fontSize: 17, marginTop: 15 }}>
-            Mã số ứng viên
+            Mã số bệnh nhân
           </Text>
           <TextInput
             placeholderTextColor={"black"}
-            placeholder="Mã số ứng viên"
+            placeholder="Mã số bệnh nhân"
             style={styles.input}
-            value={code}
-            onChangeText={setCode}
+            value={id}
+            onChangeText={setId}
           />
-          {errors.code && <Text style={styles.errorText}>{errors.code}</Text>}
+          {errors.id && <Text style={styles.errorText}>{errors.id}</Text>}
         </View>
 
         <View>
           <Text style={{ fontWeight: "bold", fontSize: 17, marginTop: 15 }}>
-            Mô tả Kinh nghiệm
+            Tên bệnh
           </Text>
           <TextInput
             placeholderTextColor={"black"}
-            style={{
-              height: 70,
-              padding: 10,
-              borderColor: "#D0D0D0",
-              borderWidth: 1,
-              marginTop: 10,
-              borderRadius: 5,
-            }}
-            value={experience}
-            onChangeText={setExperience}
+            placeholder="Tên bệnh"
+            style={styles.input}
+            value={diseaseName}
+            onChangeText={setDiseaseName}
           />
+          {errors.diseaseName && (
+            <Text style={styles.errorText}>{errors.diseaseName}</Text>
+          )}
         </View>
 
         <View>
           <Text style={{ fontWeight: "bold", fontSize: 17, marginTop: 15 }}>
-            Email
+            Số điện thoại
           </Text>
           <TextInput
             placeholderTextColor={"black"}
-            placeholder="Nhập địa chỉ email"
+            placeholder="Số điện thoại"
             style={styles.input}
-            value={email}
-            onChangeText={setEmail}
+            value={number}
+            onChangeText={setNumber}
           />
-          {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
+          {errors.number && (
+            <Text style={styles.errorText}>{errors.number}</Text>
+          )}
         </View>
 
         <View>
@@ -163,8 +181,11 @@ const AddAddressScreen = () => {
             value={address}
             onChangeText={setAddress}
           />
+          {errors.address && (
+            <Text style={styles.errorText}>{errors.address}</Text>
+          )}
         </View>
-
+        
         <View style={styles.buttonContainer}>
           <Pressable style={styles.deleteButton} onPress={handleCancelPress}>
             <Text style={styles.buttonText}>Hủy bỏ</Text>
@@ -177,7 +198,7 @@ const AddAddressScreen = () => {
     </ScrollView>
   );
 };
-export default AddAddressScreen;
+export default AddScreen;
 
 const styles = StyleSheet.create({
   searchBarTitleContainer: {
@@ -209,13 +230,13 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   buttonContainer: {
-    flexDirection: "row", // Hiển thị các phần tử con theo hàng ngang
-    justifyContent: "center", // Căn giữa theo chiều ngang
-    alignItems: "center", // Căn giữa theo chiều dọc
+    flexDirection: "row", // Display children in a row
+    justifyContent: "center", // Center horizontally
+    alignItems: "center", // Center vertically
   },
   deleteButton: {
-    flex: 1, // Sử dụng một phần bằng nhau của không gian
-    marginRight: 175, // Khoảng cách giữa hai nút
+    flex: 1, // Take up equal space
+    marginRight: 175, // Space between buttons
     alignItems: "center",
     borderRadius: 4,
     marginTop: 30,
@@ -225,7 +246,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   addsButton: {
-    flex: 1, // Sử dụng một phần bằng nhau của không gian
+    flex: 1, // Take up equal space
     alignItems: "center",
     borderRadius: 4,
     marginTop: 30,
